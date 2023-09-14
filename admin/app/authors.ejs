@@ -1,0 +1,336 @@
+<%- include('../partials/header.ejs') %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">Authors</h1>
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <button type="button" class="btn btn-primary btn-block" data-toggle="modal"
+                                data-target="#modalAddAuthor">
+                                <i class="fas fa-plus">&nbsp;</i>
+                                Add Author
+                            </button>
+                        </ol>
+                    </div>
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div><!-- /.content-header -->
+
+        <div class="container-fluid">
+            <!-- Small boxes (Stat box) -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <table id="example1" class="table table-bordered table-striped ">
+                                <thead>
+                                    <tr>
+                                        <th class="sorting sorting_asc" tabindex="0" aria-controls="example1"
+                                            rowspan="1" colspan="1" style="width: 36.2px;" aria-sort="ascending"
+                                            aria-label="#: activate to sort column descending">#</th>
+                                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1"
+                                            colspan="1" style="width: 192.2px;"
+                                            aria-label="Category Image: activate to sort column ascending">
+                                            Profile Picture</th>
+                                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1"
+                                            colspan="1" style="width: 198.2px;"
+                                            aria-label="Category Name: activate to sort column ascending">
+                                            Author Name</th>
+                                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1"
+                                            colspan="1" style="width: 198.2px;"
+                                            aria-label="Category Name: activate to sort column ascending">
+                                            Description</th>
+                                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1"
+                                            colspan="1" style="width: 127.2px;"
+                                            aria-label="Active: activate to sort column ascending">Active
+                                        </th>
+                                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1"
+                                            colspan="1" style="width: 147.2px;"
+                                            aria-label="Action: activate to sort column ascending">Action
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% authors.forEach((author, index)=> { %>
+                                        <tr>
+                                            <td class="dtr-control sorting_1" tabindex="0">
+                                                <%= index + 1 %>
+                                            </td>
+                                            <td>
+                                                <div class="user-block">
+                                                    <img src="<%=author.profilePic %>" class="img-circle"
+                                                        alt="profile_pic">
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <%=author.authorName %>
+                                            </td>
+                                            <td>
+                                                <%= author.description %>
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" id="isActive"
+                                                    onchange="handleStatusChange('<%= author._id %>')" name="isActive"
+                                                    <%=author.isActive ? 'checked' : 'unchecked' %>
+                                                data-bootstrap-switch />
+                                            </td>
+                                            <td>
+                                                <div class="timeline-footer">
+                                                    <button class="btn btn-primary btn-sm"
+                                                        onclick="handleEdit('<%= JSON.stringify(author) %>')"
+                                                        data-toggle="modal"
+                                                        data-target="#modalUpdateAuthor">Edit</button>
+                                                    <button class="btn btn-danger btn-sm"
+                                                        onclick="handleDelete('<%= author._id %>')" data-toggle="modal"
+                                                        data-target="#modalDeleteAuthor">Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                </div>
+            </div>
+            <!-- /.row -->
+        </div>
+
+        <!-- Add Author -->
+        <div class="modal fade" id="modalAddAuthor">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Add Category</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <form id="formAddAuthor" action="/admin/addAuthor" method="POST" enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="authorName">Author Name</label>
+                                <input type="text" class="form-control" id="authorName" name="authorName"
+                                    placeholder="Enter Author Name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Profile Picture</label>
+                                <div class="input-group custom-file-button">
+                                    <label class="input-group-text" for="profilePic">Choose Image</label>
+                                    <input type="file" class="form-control" id="profilePic" accept="image/*"
+                                        name="profilePic" onchange="handlePickImage(1)" style="display: none;">
+                                </div>
+                                <img class="img-fluid mt-3" id="imageAtCreate" src="" style="height: 200px;">
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Description</label>
+                                <textarea class="form-control" id="description" name="description" cols="61"
+                                    rows="2"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Languages</label>
+                                <select class="select2" style="width: 100%;" id="languages" name="languages"
+                                    multiple="multiple" data-placeholder="Select a Languages">
+                                    <% languages.forEach((language)=> { %>
+                                        <% if(language.isActive){ %>
+                                            <option value="<%= language.language %>">
+                                                <%= language.language %>
+                                            </option>
+                                            <% } %>
+                                                <% }) %>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+
+        <!-- Update Author -->
+        <div class="modal fade " id="modalUpdateAuthor">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Update Author</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <form id="formUpdateAuthor" action="/admin/updateAuthor" method="POST"
+                        enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <input type="hidden" id="update_author_id" value="<%= authors._id %>" name="_id">
+                            <div class="form-group">
+                                <label for="newAuthorName">Author Name</label>
+                                <input type="text" class="form-control" id="newAuthorName" name="newAuthorName"
+                                    value="<%=authors.authorName %>" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Profile Picture</label>
+                                <div class="input-group custom-file-button">
+                                    <label class="input-group-text" for="newProfilePic">Change Image</label>
+                                    <input type="file" class="form-control" accept="image/*" id="newProfilePic"
+                                        name="newProfilePic" onchange="handlePickImage(2)" style="display: none;">
+                                </div>
+                                <img class="img-fluid mt-3" id="imageAtUpload" src="<%= authors.profilePic %>"
+                                    style="height: 200px;">
+                            </div>
+                            <div class="form-group">
+                                <label>Languages</label>
+                                <select class="select2" style="width: 100%;" id="newLanguages" name="newLanguages"
+                                    multiple="multiple" data-placeholder="Select a Languages"
+                                    data-value="<%= authors.languages %>">
+                                    <% languages.forEach((language)=> { %>
+                                        <% if (language.isActive) { %>
+                                            <option value="<%= language._id %>">
+                                                <%= language.language %>
+                                            </option>
+                                            <% } %>
+                                                <% }) %>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="newDescription">Description</label>
+                                <textarea name="newDescription" id="newDescription" cols="61"
+                                    rows="2"><%= authors.description %></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="reset" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+
+        <!-- delete Author -->
+        <div class="modal fade " id="modalDeleteAuthor">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form id="deleteAuthor" action="/admin/deleteAuthor/<%= authors._id %>" method="DELETE">
+                        <div class="modal-body">
+                            <input type="hidden" id="delete_author_id" value="<%= authors._id %>" name="_id">
+                            <h3 style="text-align: center;">Are you sure want to delete this Author ?</h3>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="reset" class="btn btn-default" data-dismiss="modal">No</button>
+                            <button type="submit" class="btn btn-primary">Yes</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+
+    </div>
+
+    <script type="text/javascript">
+        function handlePickImage(pickFor) {
+            let reader = new FileReader();
+            switch (pickFor) {
+                case 1:
+                    reader.readAsDataURL(document.getElementById('profilePic').files[0]);
+                    reader.onload = function (e) {
+                        document.getElementById('imageAtCreate').src = e.target.result;
+                    }
+                    break;
+                case 2:
+                    reader.readAsDataURL(document.getElementById('newProfilePic').files[0]);
+                    reader.onload = function (e) {
+                        document.getElementById('imageAtUpload').src = e.target.result;
+                    }
+            }
+        }
+
+        function handleStatusChange(authorId) {
+            console.log('data', authorId)
+            $.ajax({
+                url: `/admin/author/status/${authorId}`,
+                type: 'PATCH',
+                data: null,
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function (data) {
+                    toastr.success(data.msg)
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 2000)
+                },
+                error: function (err) {
+                    var errorMessage = err.responseJSON && err.responseJSON.err_msg ? err.responseJSON.err_msg : 'Something went wrong';
+                    toastr.error(errorMessage);
+                }
+            })
+        }
+
+        function handleEdit(data) {
+            var author = JSON.parse(data);
+
+            document.getElementById('update_author_id').value = author._id;
+            document.getElementById('newAuthorName').value = author.authorName;
+            document.getElementById('imageAtUpload').src = author.profilePic;
+            document.getElementById('newDescription').value = author.description;
+            var selectedLanguages = author.languages;
+
+            $('#newLanguages').val(selectedLanguages);
+            $('#newLanguages').trigger('change');
+            $('#modalUpdateAuthor').modal('show');
+        }
+
+        function handleDelete(authorId) {
+            document.getElementById('delete_author_id').value = authorId
+            $('#modalDeleteAuthor').modal('show')
+
+            $('form#deleteAuthor').submit(function (e) {
+                e.preventDefault()
+                var form = this;
+                var formData = new FormData(form)
+                $.ajax({
+                    url: `/admin/deleteAuthor/${authorId}`,
+                    type: 'DELETE',
+                    data: null,
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    success: function (data) {
+                        form.reset()
+                        toastr.success(data.msg)
+                        $('#modalDeleteAuthor').modal('hide');
+                        if (data.data.reloadRequired) {
+                            setTimeout(() => {
+                                window.location.reload()
+                            }, 2000)
+                        }
+                    },
+                    error: function (err) {
+                        form.reset()
+                        $('#modalDeleteAuthor').modal('hide');
+                        var errorMessage = err.responseJSON && err.responseJSON.err_msg ? err.responseJSON.err_msg : 'Something went wrong';
+                        toastr.error(errorMessage);
+                    }
+                })
+
+            })
+        }
+
+    </script>
+
+
+    <%- include('../partials/footer.ejs') %>

@@ -1,0 +1,321 @@
+<%- include('../partials/header.ejs') %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">Categories</h1>
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <button type="button" class="btn btn-primary btn-block" data-toggle="modal"
+                                data-target="#modalAddCategory">
+                                <i class="fas fa-plus">&nbsp;</i>
+                                Add Category
+                            </button>
+                        </ol>
+                    </div>
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div><!-- /.content-header -->
+
+        <div class="container-fluid">
+            <!-- Small boxes (Stat box) -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <table id="example1" class="table table-bordered table-striped ">
+                                <thead>
+                                    <tr>
+                                        <th class="sorting sorting_asc" tabindex="0" aria-controls="example1"
+                                            rowspan="1" colspan="1" style="width: 36.2px;" aria-sort="ascending"
+                                            aria-label="#: activate to sort column descending">#</th>
+                                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1"
+                                            colspan="1" style="width: 192.2px;"
+                                            aria-label="Category Image: activate to sort column ascending">
+                                            Category
+                                            Image</th>
+                                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1"
+                                            colspan="1" style="width: 198.2px;"
+                                            aria-label="Category Name: activate to sort column ascending">
+                                            Category
+                                            Name</th>
+                                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1"
+                                            colspan="1" style="width: 243.2px;" aria-label="Feature Category 
+                                                            : activate to sort column ascending">Feature Category <span
+                                                class="fas fa-info-circle ml-1" data-toggle="tooltip"
+                                                data-placement="top" title=""
+                                                data-original-title="Featured Category Shown at Home Screen"></span>
+                                        </th>
+                                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1"
+                                            colspan="1" style="width: 127.2px;"
+                                            aria-label="Active: activate to sort column ascending">Active
+                                        </th>
+                                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1"
+                                            colspan="1" style="width: 147.2px;"
+                                            aria-label="Action: activate to sort column ascending">Action
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% categories.forEach((category, index)=> { %>
+                                        <tr>
+                                            <td class="dtr-control sorting_1" tabindex="0">
+                                                <%= index + 1 %>
+                                            </td>
+                                            <td>
+                                                <div class="user-block">
+                                                    <img src="<%=category.categoryImage %>" class="img-circle"
+                                                        alt="profile_pic">
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <%=category.categoryName %>
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" id="isFeature"
+                                                    onchange="handleFeatureChange('<%= category._id %>')"
+                                                    name="isFeature" <%=category.isFeature ? 'checked' : 'unchecked' %>
+                                                data-bootstrap-switch />
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" id="isActive"
+                                                    onchange="handleStatusChange('<%= category._id %>')" name="isActive"
+                                                    <%=category.isActive ? 'checked' : 'unchecked' %>
+                                                data-bootstrap-switch />
+                                            </td>
+                                            <td>
+                                                <div class="timeline-footer">
+                                                    <button class="btn btn-primary btn-sm"
+                                                        onclick="handleEdit('<%= JSON.stringify(category) %>')"
+                                                        data-toggle="modal"
+                                                        data-target="#modalUpdateCategory">Edit</button>
+                                                    <button class="btn btn-danger btn-sm"
+                                                        onclick="handleDelete('<%= category._id %>')"
+                                                        data-toggle="modal"
+                                                        data-target="#modalDeleteCategory">Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                </div>
+            </div>
+            <!-- /.row -->
+        </div>
+
+        <!-- Add Category -->
+        <div class="modal fade" id="modalAddCategory">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Add Category</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <form id="formAddCategory" action="/admin/addCategory" method="POST" enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="categoryName">Category Name</label>
+                                <input type="text" class="form-control" id="categoryName" name="categoryName"
+                                    placeholder="Enter Category Name" required="">
+                            </div>
+                            <div class="form-group">
+                                <label>Category Image</label>
+                                <div class="input-group custom-file-button">
+                                    <label class="input-group-text" for="categoryImage">Choose Image</label>
+                                    <input type="file" class="form-control" id="categoryImage" accept="image/*"
+                                        name="categoryImage" onchange="handlePickImg(1)" style="display: none;">
+                                </div>
+                                <img class="img-fluid mt-3" id="imageAtCreate" src="">
+                            </div>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+
+        <!-- Update Category -->
+        <div class="modal fade " id="modalUpdateCategory">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Update Category</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <form id="formUpdateCategory" action="/admin/updateCategory" method="POST"
+                        enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <input type="hidden" id="update_category_id" value="<%= categories._id %>" name="_id">
+                            <div class="form-group">
+                                <label for="newCategoryName">Category Name</label>
+                                <input type="text" class="form-control" id="newCategoryName" name="newCategoryName"
+                                    value="<%=categories.categoryName %>" required="">
+                            </div>
+                            <div class="form-group">
+                                <label>Category Image</label>
+                                <div class="input-group custom-file-button">
+                                    <label class="input-group-text" for="newCategoryImage">Change Image</label>
+                                    <input type="file" class="form-control" accept="image/*" id="newCategoryImage"
+                                        name="newCategoryImage" onchange="handlePickImg(2)" style="display: none;">
+                                </div>
+                                <img class="img-fluid mt-3" id="imageAtUpload" src="<%=categories.categoryImage %>">
+                            </div>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="reset" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+
+        <!-- delete Category -->
+        <div class="modal fade " id="modalDeleteCategory">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form id="deleteCategory" action="/admin/deleteCategory/<%= categories._id %>" method="DELETE">
+                        <div class="modal-body">
+                            <input type="hidden" id="delete_category_id" value="<%= categories._id %>" name="_id">
+                            <h3 style="text-align: center;">Are you sure want to delete this category ?</h3>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="reset" class="btn btn-default" data-dismiss="modal">No</button>
+                            <button type="submit" class="btn btn-primary">Yes</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+
+    </div>
+
+    <script type="text/javascript">
+        function handlePickImg(pickFor) {
+            let reader = new FileReader();
+            switch (pickFor) {
+                case 1:
+                    reader.readAsDataURL(document.getElementById('categoryImage').files[0]);
+                    reader.onload = function (e) {
+                        document.getElementById('imageAtCreate').src = e.target.result;
+                    }
+                    break;
+                case 2:
+                    reader.readAsDataURL(document.getElementById('newCategoryImage').files[0]);
+                    reader.onload = function (e) {
+                        document.getElementById('imageAtUpload').src = e.target.result;
+                    }
+            }
+        }
+
+        function handleEdit(data) {
+            var category = JSON.parse(data);
+
+            document.getElementById('update_category_id').value = category._id;
+            document.getElementById('newCategoryName').value = category.categoryName;
+            document.getElementById('imageAtUpload').src = category.categoryImage;
+            $('#modalUpdateCategory').modal('show');
+        }
+
+        function handleFeatureChange(categoryId) {
+            console.log('data', categoryId)
+            $.ajax({
+                url: `/admin/category/feature/${categoryId}`,
+                type: 'PATCH',
+                data: null,
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function (data) {
+                    toastr.success(data.msg)
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 2000)
+                },
+                error: function (err) {
+                    var errorMessage = err.responseJSON && err.responseJSON.err_msg ? err.responseJSON.err_msg : 'Something went wrong';
+                    toastr.error(errorMessage);
+                }
+            })
+        }
+
+        function handleStatusChange(categoryId) {
+            console.log('data', categoryId)
+            $.ajax({
+                url: `/admin/category/status/${categoryId}`,
+                type: 'PATCH',
+                data: null,
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function (data) {
+                    toastr.success(data.msg)
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 2000)
+                },
+                error: function (err) {
+                    var errorMessage = err.responseJSON && err.responseJSON.err_msg ? err.responseJSON.err_msg : 'Something went wrong';
+                    toastr.error(errorMessage);
+                }
+            })
+        }
+
+        function handleDelete(categoryId) {
+            document.getElementById('delete_category_id').value = categoryId
+            $('#modalDeleteCategory').modal('show')
+
+            $('form#deleteCategory').submit(function (e) {
+                e.preventDefault()
+                var form = this;
+                var formData = new FormData(form)
+                $.ajax({
+                    url: `/admin/deleteCategory/${categoryId}`,
+                    type: 'DELETE',
+                    data: null,
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    success: function (data) {
+                        form.reset()
+                        toastr.success(data.msg)
+                        $('#modalDeleteCategory').modal('hide');
+                        if (data.data.reloadRequired) {
+                            setTimeout(() => {
+                                window.location.reload()
+                            }, 2000)
+                        }
+                    },
+                    error: function (err) {
+                        form.reset()
+                        $('#modalDeleteCategory').modal('hide');
+                        var errorMessage = err.responseJSON && err.responseJSON.err_msg ? err.responseJSON.err_msg : 'Something went wrong';
+                        toastr.error(errorMessage);
+                    }
+                })
+
+            })
+        }
+    </script>
+
+    <%- include('../partials/footer.ejs') %>

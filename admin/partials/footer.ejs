@@ -1,0 +1,635 @@
+<!-- Main Footer -->
+<footer class="main-footer">
+    <strong>Copyright &copy; <%= setting.copyrightYear %> <a href="<%= setting.appHost %>" target="_blank">
+                <%= setting.appHost %>
+            </a>.</strong>
+    All rights reserved.
+    <div class="float-right d-none d-sm-inline-block">
+        <b>Version</b> 3.2.0
+    </div>
+</footer>
+
+<!-- Control Sidebar -->
+<aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+</aside>
+<!-- /.control-sidebar -->
+<div id="sidebar-overlay"></div>
+</div>
+
+<!-- jQuery -->
+<script src="/plugins/jquery/jquery.min.js"></script>
+<!-- jQuery UI 1.11.4 -->
+<script src="/plugins/jquery-ui/jquery-ui.min.js"></script>
+<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+<script>
+    $.widget.bridge('uibutton', $.ui.button)
+</script>
+<!-- Bootstrap 4 -->
+<script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+<!-- Select2 -->
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<!-- Bootstrap4 Duallistbox -->
+<script src="/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>
+<!-- DataTables  & Plugins -->
+<script src="/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+<script src="/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+<script src="/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+<script src="/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+<script src="/plugins/jszip/jszip.min.js"></script>
+<script src="/plugins/pdfmake/pdfmake.min.js"></script>
+<script src="/plugins/pdfmake/vfs_fonts.js"></script>
+<script src="/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+<script src="/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+<script src="/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+<!-- Sparkline -->
+<script src="/plugins/sparklines/sparkline.js"></script>
+<!-- JQVMap -->
+<script src="/plugins/jqvmap/jquery.vmap.min.js"></script>
+<script src="/plugins/jqvmap/maps/jquery.vmap.usa.js"></script>
+<!-- jQuery Knob Chart -->
+<script src="/plugins/jquery-knob/jquery.knob.min.js"></script>
+<!-- daterangepicker -->
+<script src="/plugins/moment/moment.min.js"></script>
+<script src="/plugins/inputmask/jquery.inputmask.min.js"></script>
+<script src="/plugins/daterangepicker/daterangepicker.js"></script>
+<!-- Tempusdominus Bootstrap 4 -->
+<script src="/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+<!-- Bootstrap Switch -->
+<script src="/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+<!-- bootstrap color picker -->
+<script src="/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
+<!-- BS-Stepper -->
+<script src="/plugins/bs-stepper/js/bs-stepper.min.js"></script>
+<!-- dropzonejs -->
+<script src="/plugins/dropzone/min/dropzone.min.js"></script>
+<!-- overlayScrollbars -->
+<script src="/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+<script src="/plugins/toastr/toastr.min.js"></script>
+<!-- AdminLTE App -->
+<script src="/dist/js/adminlte.js"></script>
+
+<script>
+
+    $('form#logout').submit((e) => {
+        console.log('logout admin')
+        $.ajax({
+            type: "GET",
+            url: '/admin/logout',
+            dataType: 'json',
+            success: function (data) {
+                $('#modalLogout').modal('hide');
+                window.location.reload()
+            },
+            error: function (data) {
+                $('#modalLogout').modal('hide');
+                window.location.reload()
+            }
+
+        })
+    })
+
+    toastr.options = {
+        "closeButton": false,
+        "debug": false,
+        "newestOnTop": false,
+        "progressBar": true,
+        "positionClass": "toast-top-right",
+        "preventDuplicates": true,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "2000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    }
+
+    $(function () {
+        //Initialize Select2 Elements
+        $('.select2').select2()
+
+        //Initialize Select2 Elements
+        $('.select2bs4').select2({
+            theme: 'bootstrap4'
+        })
+    })
+
+    $(function () {
+        bsCustomFileInput.init();
+    });
+    $("input[data-bootstrap-switch]").each(function () {
+        $(this).bootstrapSwitch('state', $(this).prop(''));
+    })
+    $(function () {
+        $("#example1").DataTable({
+            "responsive": true, "lengthChange": false, "autoWidth": true,
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+    });
+
+    $('form#formAddLanguage').submit(function (e) {
+        e.preventDefault()
+        var form = this;
+        var formData = new FormData(form)
+        var pass = {}
+
+        for (const [key, value] of formData) {
+            pass[key] = value
+            console.log(pass[key])
+        }
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'),
+            contentType: 'application/json',
+            data: JSON.stringify(pass),
+            success: function (data) {
+                form.reset()
+                $('#modalAddLanguage').modal('hide');
+                toastr.success(data.msg)
+                if (data.data.reloadRequired) {
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 2000)
+                }
+            },
+            error: function (err) {
+                console.log("footer add language err : ", err)
+                form.reset()
+                $('#modalAddLanguage').modal('hide');
+                var errorMessage = err.responseJSON && err.responseJSON.err_msg ? err.responseJSON.err_msg : 'Something went wrong';
+                toastr.error(errorMessage);
+            }
+        });
+    })
+
+    $('form#formUpdateLanguage').submit(function (e) {
+        e.preventDefault()
+        var form = this;
+        var formData = new FormData(form)
+        var pass = {}
+
+        for (const [key, value] of formData) {
+            pass[key] = value
+            console.log(pass[key])
+        }
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'),
+            contentType: 'application/json',
+            data: JSON.stringify(pass),
+            success: function (data) {
+                form.reset()
+                $('#modalUpdateLanguage').modal('hide');
+                toastr.success(data.msg)
+                if (data.data.reloadRequired) {
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 2000)
+                }
+            },
+            error: function (err) {
+                form.reset()
+                $('#modalUpdateLanguage').modal('hide');
+                var errorMessage = err.responseJSON && err.responseJSON.err_msg ? err.responseJSON.err_msg : 'Something went wrong';
+                toastr.error(errorMessage);
+            }
+        });
+    })
+
+    $('form#formAddAuthor').submit(function (e) {
+        e.preventDefault()
+        var form = this;
+        var formData = new FormData(form)
+        var image = $('#profilePic').val()
+        if (image == '') {
+            toastr.error("please Select Image")
+        } else {
+            formData.append('profilePic', image)
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'),
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                data: formData,
+                success: function (data) {
+                    form.reset()
+                    document.getElementById('imageAtCreate').src = ""
+                    $('#modalAddAuthor').modal('hide');
+                    toastr.success(data.msg)
+                    if (data.data.reloadRequired) {
+                        setTimeout(() => {
+                            window.location.reload()
+                        }, 2000)
+                    }
+                },
+                error: function (err) {
+                    console.log("footer add author err : ", err)
+                    form.reset()
+                    document.getElementById('imageAtCreate').src = ""
+                    $('#modalAddAuthor').modal('hide');
+                    var errorMessage = err.responseJSON && err.responseJSON.err_msg ? err.responseJSON.err_msg : 'Something went wrong';
+                    toastr.error(errorMessage);
+                }
+            });
+        }
+    })
+
+    $('form#formUpdateAuthor').submit(function (e) {
+        e.preventDefault()
+        var form = this;
+        var formData = new FormData(form)
+        var image = $('#newProfilePic').val()
+        console.log('formdata : ', formData);
+        if (image != '') {
+            formData.append('newProfilePic', image);
+        } else {
+            formData.delete('newProfilePic')
+        }
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'),
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            data: formData,
+            success: function (data) {
+                console.log('data', data)
+                form.reset()
+                $('#modalUpdateAuthor').modal('hide');
+                toastr.success(data.msg)
+                if (data.data.reloadRequired) {
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 2000)
+                }
+            },
+            error: function (err) {
+                form.reset()
+                $('#modalUpdateAuthor').modal('hide');
+                var errorMessage = err.responseJSON && err.responseJSON.err_msg ? err.responseJSON.err_msg : 'Something went wrong';
+                toastr.error(errorMessage);
+            }
+        });
+    })
+
+    $('form#formAddCategory').submit(function (e) {
+        e.preventDefault()
+        var form = this;
+        var formData = new FormData(form)
+        var image = $('#categoryImage').val()
+        if (image == '') {
+            toastr.error("please Select Image")
+        } else {
+            formData.append('categoryImage', image)
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'),
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                data: formData,
+                success: function (data) {
+                    form.reset()
+                    document.getElementById('imageAtCreate').src = ""
+                    $('#modalAddCategory').modal('hide');
+                    toastr.success(data.msg)
+                    if (data.data.reloadRequired) {
+                        setTimeout(() => {
+                            window.location.reload()
+                        }, 2000)
+                    }
+                },
+                error: function (err) {
+                    console.log("footer add category err : ", err)
+                    form.reset()
+                    document.getElementById('imageAtCreate').src = ""
+                    $('#modalAddCategory').modal('hide');
+                    var errorMessage = err.responseJSON && err.responseJSON.err_msg ? err.responseJSON.err_msg : 'Something went wrong';
+                    toastr.error(errorMessage);
+                }
+            });
+        }
+    })
+
+    $('form#formUpdateCategory').submit(function (e) {
+        e.preventDefault()
+        var form = this;
+        var formData = new FormData(form)
+        var image = $('#newCategoryImage').val()
+        if (image != '') {
+            formData.append('newCategoryImage', image);
+        } else {
+            formData.delete('newCategoryImage')
+        }
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'),
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            data: formData,
+            success: function (data) {
+                form.reset()
+                $('#modalUpdateCategory').modal('hide');
+                toastr.success(data.msg)
+                if (data.data.reloadRequired) {
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 2000)
+                }
+            },
+            error: function (err) {
+                form.reset()
+                $('#modalUpdateCategory').modal('hide');
+                var errorMessage = err.responseJSON && err.responseJSON.err_msg ? err.responseJSON.err_msg : 'Something went wrong';
+                toastr.error(errorMessage);
+            }
+        });
+    })
+
+    $('form#formChangePassword').submit(function (e) {
+        e.preventDefault()
+        var form = this;
+        var formData = new FormData(form)
+        var pass = {}
+        for (const [key, value] of formData) {
+            pass[key] = value
+        }
+        if (pass.newPassword != pass.confirmNewPassword) {
+            toastr.error("Password Should be not matched!!!")
+        } else {
+            const url = $(this).attr('action');
+            $.ajax({
+                url: url,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(pass),
+                success: function (data) {
+                    form.reset()
+                    $('#modalChangePassword').modal('hide');
+                    toastr.success(data.msg)
+                    if (data.data.reloadRequired) {
+                        setTimeout(() => {
+                            window.location.reload()
+                        }, 2000)
+                    }
+                },
+                error: function (err) {
+                    form.reset()
+                    $('#modalChangePassword').modal('hide');
+                    var errorMessage = err.responseJSON && err.responseJSON.err_msg ? err.responseJSON.err_msg : 'Something went wrong';
+                    toastr.error(errorMessage);
+                }
+            })
+        }
+    })
+
+    $('form#formAppSetting').submit(function (e) {
+        e.preventDefault();
+        var form = this;
+        var formData = new FormData(form)
+        formData.delete('files')
+        for (const [key, value] of formData) {
+            console.log(key, ":", value)
+        }
+        var image = $('#userPlaceholder').val()
+        if (image != '') {
+            formData.append('userPlaceholder', image);
+        } else {
+            formData.delete('userPlaceholder')
+        }
+        formData.set('updateAppMessage', tinyMCE.get('updateAppMessage').getContent())
+        formData.set('privacyPolicy', tinyMCE.get('privacyPolicy').getContent())
+        formData.set('termsOfUse', tinyMCE.get('termsOfUse').getContent())
+        console.log('formData App : ', formData);
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'),
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            data: formData,
+            success: function (data) {
+                toastr.success(data.msg)
+                if (data.data.reloadRequired) {
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 2000)
+                }
+            },
+            error: function (err) {
+                var errorMessage = err.responseJSON && err.responseJSON.err_msg ? err.responseJSON.err_msg : 'Something went wrong';
+                toastr.error(errorMessage);
+            }
+        })
+    })
+
+    $('form#formAdsSetting').submit(function (e) {
+        e.preventDefault();
+        var form = this;
+        var formData = new FormData(form)
+        var pass = {}
+
+        for (const [key, value] of formData) {
+            pass[key] = value
+            console.log(pass[key])
+        }
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'),
+            contentType: 'application/json',
+            data: JSON.stringify(pass),
+            success: function (data) {
+                toastr.success(data.msg)
+                if (data.data.reloadRequired) {
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 2000)
+                }
+            },
+            error: function (err) {
+                var errorMessage = err.responseJSON && err.responseJSON.err_msg ? err.responseJSON.err_msg : 'Something went wrong';
+                toastr.error(errorMessage);
+            }
+        })
+    })
+
+    $('form#formAdminSetting').submit(function (e) {
+        e.preventDefault()
+        var form = this;
+        var formData = new FormData(form)
+        formData.delete('files')
+        var image = $('#appIcon').val()
+        if (image != '') {
+            formData.append('appIcon', image);
+        } else {
+            formData.delete('appIcon')
+        }
+        $.ajax({
+            type: "POST",
+            url: $(this).attr('action'),
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            data: formData,
+            success: function (data) {
+                toastr.success(data.msg)
+                if (data.data.reloadRequired) {
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 2000)
+                }
+            }, error: function (err) {
+                var errorMessage = err.responseJSON && err.responseJSON.err_msg ? err.responseJSON.err_msg : 'Something went wrong';
+                toastr.error(errorMessage);
+            }
+        })
+    });
+
+    tinymce.init({
+        selector: '.textarea-app',
+        plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
+        toolbar: 'undo redo | blocks fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+        tinycomments_mode: 'embedded',
+        tinycomments_author: 'Author name',
+        mergetags_list: [
+            { value: 'First.Name', title: 'First Name' },
+            { value: 'Email', title: 'Email' },
+        ]
+    });
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
+
+<!-- <script>
+
+    
+    $('form#formSendNotification').submit(function (e) {
+        e.preventDefault()
+        var form = this;
+        var formData = new FormData(form)
+        var image = $('#notificationImage').val()
+        if (image != '') {
+            formData.append('notificationImage', image)
+        } else {
+            formData.delete('notificationImage')
+        }
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'),
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            data: formData,
+            success: function (data) {
+                form.reset()
+                $('#modalSendNotification').modal('hide');
+                toastr.success(data.msg)
+            },
+            error: function (err) {
+                form.reset()
+                $("#modalSendNotification").modal('hide')
+                toastr.error(err.responseJSON.err_msg || "Something went wrong")
+            }
+        })
+    })
+
+    $('form#formUploadBanner').submit(function (e) {
+        e.preventDefault()
+        var form = this;
+        var formData = new FormData(form)
+        var image = $('#bannerImage').val()
+        formData.append('bannerImage', image)
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'),
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            data: formData,
+            success: function (data) {
+                form.reset()
+                toastr.success(data.msg)
+                setTimeout(() => {
+                    window.location.reload()
+                }, 2000)
+            },
+            error: function (err) {
+                form.reset()
+                toastr.error(err.msg || 'Something went wrong')
+            }
+        });
+    })
+
+    $('form#formAddPaymentGateway').submit(function (e) {
+        e.preventDefault()
+        var form = this;
+        var formData = new FormData(form)
+        var image = $('#paymentGatewayImage').val()
+        var isActive = $('#isActive').checked
+        formData.append('image', image)
+        formData.append('isActive', isActive)
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'),
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            data: formData,
+            success: function (data) {
+                form.reset()
+                $('#modalAddPaymentGateway').modal('hide');
+                toastr.success(data.msg)
+                setTimeout(() => {
+                    window.location.reload()
+                }, 2000)
+            },
+            error: function (err) {
+                form.reset()
+                $('#modalAddPaymentGateway').modal('hide');
+                toastr.error(err.msg || 'Something went wrong')
+            }
+        })
+    });
+
+    $('form#formBulkUpload').submit(function (e) {
+        e.preventDefault()
+        var form = this;
+        var formData = new FormData(form)
+        var csv = $('#csvFile').val()
+        formData.append('csvFile', csv);
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'),
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            data: formData,
+            success: function (data) {
+                form.reset()
+                document.getElementById('selectedFileName').innerHTML = ""
+                $('#modalBulkUpload').modal('hide');
+                toastr.success(data.msg)
+            },
+            error: function (err) {
+                form.reset()
+                document.getElementById('selectedFileName').innerHTML = ""
+                $('#modalBulkUpload').modal('hide');
+                toastr.error(err.msg || 'Something went wrong')
+            }
+        })
+    })
+
+ 
+</script> -->
+
+</body>
+
+</html>

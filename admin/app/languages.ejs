@@ -1,0 +1,241 @@
+<%- include('../partials/header.ejs') %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">Languages</h1>
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <button type="button" class="btn btn-primary btn-block" data-toggle="modal"
+                                data-target="#modalAddLanguage">
+                                <i class="fas fa-plus">&nbsp;</i>
+                                Add Language
+                            </button>
+                        </ol>
+                    </div>
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div><!-- /.content-header -->
+
+        <div class="container-fluid">
+            <!-- Small boxes (Stat box) -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <table id="example1" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th class="sorting sorting_asc" tabindex="0" aria-controls="example1"
+                                            rowspan="1" colspan="1" style="width: 36.2px;" aria-sort="ascending"
+                                            aria-label="#: activate to sort column descending">#</th>
+                                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1"
+                                            colspan="1" style="width: 192.2px;"
+                                            aria-label="Category Image: activate to sort column ascending">
+                                            Language</th>
+                                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1"
+                                            colspan="1" style="width: 127.2px;"
+                                            aria-label="Active: activate to sort column ascending">Active
+                                        </th>
+                                        <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1"
+                                            colspan="1" style="width: 147.2px;"
+                                            aria-label="Action: activate to sort column ascending">Action
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% languages.forEach((language, index)=> { %>
+                                        <tr>
+                                            <td class="dtr-control sorting_1" tabindex="0">
+                                                <%= index + 1 %>
+                                            </td>
+                                            <td>
+                                                <%= language.language %>
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" id="isActive"
+                                                    onchange="handleStatusChange('<%= language._id %>')" name="isActive"
+                                                    <%=language.isActive ? 'checked' : 'unchecked' %>
+                                                data-bootstrap-switch />
+                                            </td>
+                                            <td>
+                                                <div class="timeline-footer">
+                                                    <button class="btn btn-primary btn-sm"
+                                                        onclick="handleEdit('<%= JSON.stringify(language) %>')"
+                                                        data-toggle="modal"
+                                                        data-target="#modalUpdateLanguage">Edit</button>
+                                                    <button class="btn btn-danger btn-sm"
+                                                        onclick="handleDelete('<%= language._id %>')"
+                                                        data-toggle="modal"
+                                                        data-target="#modalDeleteLanguage">Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                </div>
+            </div>
+            <!-- /.row -->
+        </div>
+
+        <!-- Add Language -->
+        <div class="modal fade" id="modalAddLanguage">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Add Language</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <form id="formAddLanguage" action="/admin/addLanguage" method="POST" enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="language">Language</label>
+                                <input type="text" class="form-control" id="language" name="language"
+                                    placeholder="Enter Language" required="">
+                            </div>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+
+        <!-- Update Language -->
+        <div class="modal fade " id="modalUpdateLanguage">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Update Language</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <form id="formUpdateLanguage" action="/admin/updateLanguage" method="POST"
+                        enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <input type="hidden" id="update_language_id" value="<%= languages._id %>" name="_id">
+                            <div class="form-group">
+                                <label for="newLanguage">Author Name</label>
+                                <input type="text" class="form-control" id="newLanguage" name="newLanguage"
+                                    value="<%=languages.language %>" required="">
+                            </div>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="reset" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+
+        <!-- delete Language -->
+        <div class="modal fade " id="modalDeleteLanguage">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form id="deleteLanguage" action="/admin/deleteLanguage/<%= languages._id %>" method="DELETE">
+                        <div class="modal-body">
+                            <input type="hidden" id="delete_language_id" value="<%= languages._id %>" name="_id">
+                            <h3 style="text-align: center;">Are you sure want to delete this Language ?</h3>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="reset" class="btn btn-default" data-dismiss="modal">No</button>
+                            <button type="submit" class="btn btn-primary">Yes</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+
+    </div>
+
+    <script type="text/javascript">
+        function handleEdit(data) {
+            var Language = JSON.parse(data);
+
+            document.getElementById('update_language_id').value = Language._id;
+            document.getElementById('newLanguage').value = Language.language;
+            $('#modalUpdateLanguage').modal('show');
+        }
+
+        function handleStatusChange(languageId) {
+            console.log('data', languageId)
+            $.ajax({
+                url: `/admin/language/status/${languageId}`,
+                type: 'PATCH',
+                data: null,
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function (data) {
+                    toastr.success(data.msg)
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 2000)
+                },
+                error: function (err) {
+                    var errorMessage = err.responseJSON && err.responseJSON.err_msg ? err.responseJSON.err_msg : 'Something went wrong';
+                    toastr.error(errorMessage);
+                }
+            })
+        }
+
+        function handleDelete(languageId) {
+            document.getElementById('delete_language_id').value = languageId
+            $('#modalDeleteLanguage').modal('show')
+
+            $('form#deleteLanguage').submit(function (e) {
+                e.preventDefault()
+                var form = this;
+                var formData = new FormData(form)
+                $.ajax({
+                    url: `/admin/deleteLanguage/${languageId}`,
+                    type: 'DELETE',
+                    data: null,
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    success: function (data) {
+                        form.reset()
+                        toastr.success(data.msg)
+                        $('#modalDeleteLanguage').modal('hide');
+                        if (data.data.reloadRequired) {
+                            setTimeout(() => {
+                                window.location.reload()
+                            }, 2000)
+                        }
+                    },
+                    error: function (err) {
+                        form.reset()
+                        $('#modalDeleteLanguage').modal('hide');
+                        var errorMessage = err.responseJSON && err.responseJSON.err_msg ? err.responseJSON.err_msg : 'Something went wrong';
+                        toastr.error(errorMessage);
+                    }
+                })
+
+            })
+        }
+
+
+    </script>
+
+    <%- include('../partials/footer.ejs') %>
